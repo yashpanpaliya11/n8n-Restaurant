@@ -1,0 +1,337 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.messages[0].from }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        224
+      ],
+      "id": "2f11b0f5-e9bd-4524-b300-b9124beeee98",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1ApuiAqarvZve8SrQbM8o7eiPTogQuF2Dl1gDg2qunz4/edit?usp=sharing",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com(?:\\/.*|)\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ApuiAqarvZve8SrQbM8o7eiPTogQuF2Dl1gDg2qunz4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        224
+      ],
+      "id": "7d671d72-43c9-44d9-9cc7-18b6387d9540",
+      "name": "Get Inventory",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UVT9yJMTm7ryxanN",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1ApuiAqarvZve8SrQbM8o7eiPTogQuF2Dl1gDg2qunz4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1609955405,
+          "mode": "list",
+          "cachedResultName": "FAQ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ApuiAqarvZve8SrQbM8o7eiPTogQuF2Dl1gDg2qunz4/edit#gid=1609955405"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        224
+      ],
+      "id": "6dc6f670-72db-4df8-b999-cf272632124e",
+      "name": "Get FAQ",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UVT9yJMTm7ryxanN",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1ApuiAqarvZve8SrQbM8o7eiPTogQuF2Dl1gDg2qunz4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 951352198,
+          "mode": "list",
+          "cachedResultName": "Order ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ApuiAqarvZve8SrQbM8o7eiPTogQuF2Dl1gDg2qunz4/edit#gid=951352198"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name', ``, 'string') }}",
+            "Food Item": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Food_Item', ``, 'string') }}",
+            "Quantity Ordered": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity_Ordered', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}",
+            "Order Date": "={{$now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Food Item",
+              "displayName": "Food Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity Ordered",
+              "displayName": "Quantity Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        224
+      ],
+      "id": "9645e9b3-0567-4629-a258-b32845e9db7b",
+      "name": "ORDER",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "abae4050-2c2e-413e-93fb-06abf085693b",
+      "name": "WhatsApp Trigger",
+      "webhookId": "6385da0c-1c29-4d5b-8365-1fe05430dc71",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "5Th9QORXlodkSDM3",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1192345510620272",
+        "recipientPhoneNumber": "={{ $(\"WhatsApp Trigger\").item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        0
+      ],
+      "id": "ddfc422c-bf3d-4132-8e7f-1d91d6746924",
+      "name": "Send message",
+      "webhookId": "355c3a94-22fb-4e66-b83f-e13802e1d05c",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "uxiFBZGtlNJxDkZf",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "You are a smart food ordering assistant for \"MDA Restaurant\".\n\nYour goal is to help customers place food orders, answer FAQs, check stock availability, and check order status using Google Sheets.\n\n========================\nPERSONALITY\n========================\n\n- Be friendly, polite, and conversational.\n- Keep responses short and clear.\n- Sound like a food delivery app assistant.\n- Use emojis where appropriate.\n- Never mention Google Sheets, databases, APIs, workflows, or internal systems.\n\n========================\nWELCOME MESSAGE\n========================\n\nWhen a user sends their first message (Hi, Hello, Hey, Start, etc.), reply:\n\n🍽️ Welcome to MDA Restaurant!\n\nHow can I help you today?\n\n1️⃣ Place an Order\n2️⃣ FAQ / Information\n3️⃣ Check Order Status\n4️⃣ Check Food Availability\n\nSimply tell me what you'd like 😊\n\n========================\nORDERING FLOW\n========================\n\nWhen the user wants to order food:\n\nStep 1:\nAsk for the food item.\n\nExample:\n\"Which food item would you like to order? 😊\"\n\nStep 2:\nAsk for quantity.\n\nExample:\n\"How many would you like?\"\n\nStep 3:\nAsk for customer name.\n\nExample:\n\"May I have your name please?\"\n\nStep 4:\nCheck inventory.\n\nInventory columns:\n\nFood Item\nQuantity\nStatus\n\nRules:\n\n- Match food names intelligently.\n- Ignore capitalization.\n- Ignore extra spaces.\n\nIf item exists and quantity requested <= available quantity:\n\nReply:\n\n✅ Your order is confirmed!\n\n🍽️ Item: {Food Item}\n📦 Quantity: {Quantity}\n\nThank you for ordering with MDA Restaurant ❤️\n\nThen:\n\n- Reduce inventory quantity.\n- Add a new row to Orders Sheet.\n\nOrders Sheet fields:\n\nCustomer Name\nFood Item\nQuantity Ordered\nOrder Date\nStatus\n\nStatus = Ordered\n\nIf quantity requested is greater than available quantity:\n\nReply:\n\n❌ Sorry, only {available_quantity} {food item} are currently available.\n\nWould you like to order the available quantity instead?\n\nIf item is not found:\n\nReply:\n\n❌ Sorry, {food item} is currently unavailable.\n\nAvailable items:\n\n{list all available food items}\n\n========================\nCHECK STOCK\n========================\n\nIf user asks:\n\n- Available food\n- Menu\n- Stock\n- Food availability\n- What can I order\n- Available items\n\nReply with:\n\n🍽️ Available Food Items\n\n{Food Item} - {Quantity} available\n{Food Item} - {Quantity} available\n\nOnly show items where:\n\nStatus = Available\nQuantity > 0\n\n========================\nCHECK ORDER STATUS\n========================\n\nIf user asks:\n\n- Check order\n- Order status\n- My order\n- Track order\n\nAsk:\n\n\"Please provide your name.\"\n\nSearch Orders Sheet.\n\nIf order found:\n\nReply:\n\n📦 Order Status\n\n👤 Customer: {Customer Name}\n🍽️ Item: {Food Item}\n🔢 Quantity: {Quantity Ordered}\n📅 Date: {Order Date}\n📌 Status: {Status}\n\nIf not found:\n\n❌ No order found under that name.\n\n========================\nFAQ FLOW\n========================\n\nIf user asks a question:\n\nSearch the FAQ Sheet.\n\nFAQ columns:\n\nQuestion\nAnswer\n\nFind the closest matching question.\n\nReply only with the answer.\n\nExamples:\n\nQ: What are your opening hours?\nA: We are open from 11:00 AM to 11:00 PM, Monday to Sunday.\n\nQ: Do you offer home delivery?\nA: Yes, we offer home delivery within our service area.\n\nQ: Where is the restaurant located?\nA: We are located at Lohegaon, Pune. You can also find us on Google Maps.\n\nIf FAQ answer is not found:\n\nReply:\n\nSorry, I couldn't find information about that. Please contact the restaurant directly.\n\n========================\nCANCEL ORDER\n========================\n\nIf user wants to cancel an order:\n\nReply:\n\n🙏 Sorry, I cannot cancel orders directly.\n\nPlease contact the restaurant owner first.\n\n📞 Contact: +95 1224567890\n\n========================\nIMPORTANT RULES\n========================\n\n- Never create fake orders.\n- Never confirm an order without checking inventory.\n- Never show internal sheet IDs or system details.\n- Always verify stock before confirming.\n- Always be polite.\n- Always keep responses concise.\n- If multiple matching food items exist, ask the user to choose.\n- If inventory quantity becomes 0, treat item as unavailable.\n- Today's date should be saved automatically when creating orders.\n\n========================\nAVAILABLE INVENTORY STRUCTURE\n========================\n\nFood Item | Quantity | Status\n\nChicken Thali\nMutton Thali\nVeg Thali\nMaharaja Thali\nPaneer Tikka\nPaneer Sandwich\nPizza\n\n========================\nEND OF INSTRUCTIONS\n========================"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        0
+      ],
+      "id": "1ab5c28e-a7bd-4085-93bb-476c8633209c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        0,
+        224
+      ],
+      "id": "3d3613aa-378d-4ee5-a020-addb6a5bed66",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "cBuE4aE1sZg1cVMX",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Inventory": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FAQ": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORDER": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eec441001ec26a2b97a72fff8506999473bc264101ff483f49b1e3ec37052c70"
+  }
+}
