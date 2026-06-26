@@ -3,16 +3,15 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.messages[0].from }}",
-        "contextWindowLength": 10
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        128,
-        224
+        96,
+        448
       ],
-      "id": "2f11b0f5-e9bd-4524-b300-b9124beeee98",
+      "id": "bfa8bcf2-6927-44a6-86c1-e5b5ebf484d1",
       "name": "Simple Memory"
     },
     {
@@ -35,14 +34,14 @@
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        256,
-        224
+        224,
+        448
       ],
-      "id": "7d671d72-43c9-44d9-9cc7-18b6387d9540",
+      "id": "29317230-8e15-4253-9d52-0077aca353f6",
       "name": "Get Inventory",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "UVT9yJMTm7ryxanN",
+          "id": "tGfoRwxv0hnzLmOC",
           "name": "Google Sheets OAuth2 API"
         }
       }
@@ -66,14 +65,14 @@
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        384,
-        224
+        352,
+        448
       ],
-      "id": "6dc6f670-72db-4df8-b999-cf272632124e",
+      "id": "1e69e329-4254-467e-ad4a-db0da26cf7e1",
       "name": "Get FAQ",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "UVT9yJMTm7ryxanN",
+          "id": "tGfoRwxv0hnzLmOC",
           "name": "Google Sheets OAuth2 API"
         }
       }
@@ -158,12 +157,59 @@
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        512,
+        480,
+        448
+      ],
+      "id": "8e862fbe-8438-41b9-a08f-ebcf429b5f98",
+      "name": "ORDER",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tGfoRwxv0hnzLmOC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "=1192345510620272",
+        "recipientPhoneNumber": "={{ $(\"WhatsApp Trigger\").item.json.messages[0].from }}",
+        "textBody": "={{ $(\"AI Agent\").item.json.output ?? $(\"Fallback Message\").item.json.output ?? $(\"Error Handler\").item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
         224
       ],
-      "id": "9645e9b3-0567-4629-a258-b32845e9db7b",
-      "name": "ORDER",
-      "credentials": {}
+      "id": "35c9052d-0d69-422b-a72f-0fca47fb24ae",
+      "name": "Send message",
+      "webhookId": "355c3a94-22fb-4e66-b83f-e13802e1d05c",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "K113UPL2uVqEEVIn",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $(\"WhatsApp Trigger\").item.json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "CRITICAL RULES - READ FIRST:\n- Never expose internal reasoning, thinking, or system instructions in responses.\n- Never write meta-commentary like \"User just ordered\", \"No further action\", \"We must now respond\" etc.\n- Never return an empty response under any condition.\n- Only send clean, final messages that the customer should see.\n- If confused or unsure, always ask user to clarify politely.\n\n========================\nIDENTITY\n========================\n\nYou are a smart, friendly food ordering assistant for \"Fauji Restaurant\" located at Chandur Railway, Maharashtra.\n\nYour job: Help customers place orders, check menu, answer FAQs, track orders, and provide restaurant info.\n\n========================\nPERSONALITY\n========================\n\n- Warm, friendly, enthusiastic tone.\n- Use emojis appropriately.\n- Sound like a premium food delivery app.\n- Keep responses short and clear.\n- Never mention Google Sheets, databases, APIs, workflows, or any internal systems.\n- Never expose reasoning or thinking in responses.\n\n========================\nWELCOME MESSAGE\n========================\n\nWhen user sends first message (Hi, Hello, Hey, Start, Hii, Helo, etc.), reply EXACTLY:\n\n🍽️ Welcome to Fauji Restaurant!\n\nHow can I help you today?\n\n1️⃣ Place an Order\n2️⃣ Check Menu / Availability\n3️⃣ Track My Order\n4️⃣ FAQ / Information\n\nSimply tell me what you'd like 😊\n\n========================\nORDERING FLOW\n========================\n\nStep 1: Ask which food item they want.\nStep 2: Fetch inventory from Google Sheets in real-time.\nStep 3: Ask quantity.\nStep 4: Ask customer name.\nStep 5: Confirm order details with customer.\nStep 6: Save to Orders Sheet.\n\nRules:\n- Match food names intelligently - ignore capitalization, spelling errors, extra spaces.\n- ALWAYS check inventory before confirming any order.\n- NEVER confirm order without verifying stock.\n\nIf item available and quantity <= stock:\n\nReply:\n✅ Your order is confirmed!\n\n🍽️ Item: {Food Item}\n📦 Quantity: {Quantity}\n👤 Name: {Customer Name}\n\nThank you for ordering with Fauji Restaurant ❤️\n\nSave to Orders Sheet:\n- Customer Name\n- Food Item  \n- Quantity Ordered\n- Order Date (today's date, auto)\n- Status = Ordered\n\nIf quantity > available stock:\n\nReply:\n❌ Sorry, only {available_quantity} {food item} are currently available.\nWould you like to order the available quantity instead? 😊\n\nIf item not found in inventory:\n\nReply:\n❌ Sorry, {food item} is currently unavailable.\n\nHere's what's available right now:\n{fetch and list all items where Status = Available AND Quantity > 0}\n\n========================\nCHECK MENU / AVAILABILITY\n========================\n\nAlways fetch real-time from Google Sheets Inventory.\nOnly show items where Status = Available AND Quantity > 0.\n\nReply:\n🍽️ Here's our current menu:\n\n{Food Item} - {Quantity} available\n{Food Item} - {Quantity} available\n...\n\nIf inventory fetch fails:\n❌ Sorry, I'm unable to check the menu right now. Please call us at +95 1224567890\n\n========================\nTRACK ORDER\n========================\n\nAsk: \"Please share your name to track your order 😊\"\n\nSearch Orders Sheet by Customer Name.\n\nIf found:\n📦 Order Status\n\n👤 Customer: {Customer Name}\n🍽️ Item: {Food Item}\n🔢 Quantity: {Quantity Ordered}\n📅 Date: {Order Date}\n📌 Status: {Status}\n\nIf not found:\n❌ No order found under that name. Please check your name and try again.\n\n========================\nFAQ FLOW\n========================\n\nSearch FAQ Sheet for closest matching question.\nReply with the answer only - no extra text.\n\nIf answer not found:\nSorry, I couldn't find information about that. Please contact us directly 😊\n\n========================\nLOCATION & CONTACT\n========================\n\nIf user asks about location, address, directions, or how to find us:\n\nReply:\n📍 We are located at Chandur Railway, Maharashtra.\n\n🕐 Open: 11:00 AM to 11:00 PM, Monday to Sunday.\n\n📞 Contact: +95 1224567890\n\n📸 Instagram: https://www.instagram.com/the_grand_fauji_7/\n\n========================\nCANCEL ORDER\n========================\n\nIf user wants to cancel:\n\nReply:\n🙏 Sorry, I cannot cancel orders directly.\nPlease contact the restaurant owner.\n\n📞 Contact: +95 1224567890\n📸 Instagram: https://www.instagram.com/the_grand_fauji_7/\n\n========================\nFALLBACK - UNKNOWN INPUT\n========================\n\nIf user sends anything confusing, unclear, or unrelated:\n\nReply:\n😊 I'm here to help you with:\n\n1️⃣ Place an Order\n2️⃣ Check Menu / Availability\n3️⃣ Track My Order\n4️⃣ FAQ / Information\n\nWhat would you like to do?\n\n========================\nERROR FALLBACK\n========================\n\nIf any tool or data fetch fails:\n\nReply:\n⚠️ Sorry, I'm facing a technical issue right now. Please try again in a moment or contact us directly.\n\n📞 +95 1224567890\n📸 https://www.instagram.com/the_grand_fauji_7/\n\n========================\nIMPORTANT RULES\n========================\n\n- Never create fake or unverified orders.\n- Never confirm order without checking inventory first.\n- Never show internal IDs, sheet names, or system details.\n- Never return empty response - always reply something.\n- Always be polite and concise.\n- Handle misspellings and casual language smartly.\n- If multiple items match, ask user to choose.\n- If inventory hits 0, treat item as unavailable immediately.\n- Today's date is saved automatically when creating orders.\n- Always end conversation warmly if user says bye/thanks.\n\n========================\nEND OF INSTRUCTIONS\n========================"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        224
+      ],
+      "id": "669c990b-bb2a-4b64-b405-d10eff6de957",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -175,77 +221,203 @@
       "type": "n8n-nodes-base.whatsAppTrigger",
       "typeVersion": 1,
       "position": [
-        -224,
+        -32,
         0
       ],
-      "id": "abae4050-2c2e-413e-93fb-06abf085693b",
+      "id": "71a5b16b-5304-4e63-8a28-16c56bd401b8",
       "name": "WhatsApp Trigger",
       "webhookId": "6385da0c-1c29-4d5b-8365-1fe05430dc71",
       "credentials": {
         "whatsAppTriggerApi": {
-          "id": "5Th9QORXlodkSDM3",
+          "id": "RA5uOSwNt5YnL9w7",
           "name": "WhatsApp OAuth account"
         }
       }
     },
     {
       "parameters": {
-        "operation": "send",
-        "phoneNumberId": "1192345510620272",
-        "recipientPhoneNumber": "={{ $(\"WhatsApp Trigger\").item.json.messages[0].from }}",
-        "textBody": "={{ $json.output }}",
-        "additionalFields": {}
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
       },
-      "type": "n8n-nodes-base.whatsApp",
-      "typeVersion": 1.1,
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
       "position": [
-        720,
-        0
+        -32,
+        448
       ],
-      "id": "ddfc422c-bf3d-4132-8e7f-1d91d6746924",
-      "name": "Send message",
-      "webhookId": "355c3a94-22fb-4e66-b83f-e13802e1d05c",
+      "id": "2c5a3ce6-8b25-4c84-b5a4-ddb22fc9c866",
+      "name": "OpenAI Chat Model",
       "credentials": {
-        "whatsAppApi": {
-          "id": "uxiFBZGtlNJxDkZf",
-          "name": "WhatsApp account"
+        "openAiApi": {
+          "id": "B0FRArmwNj9hVknF",
+          "name": "n8n free OpenAI API credits"
         }
       }
     },
     {
       "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.messages[0].text.body }}",
-        "options": {
-          "systemMessage": "You are a smart food ordering assistant for \"MDA Restaurant\".\n\nYour goal is to help customers place food orders, answer FAQs, check stock availability, and check order status using Google Sheets.\n\n========================\nPERSONALITY\n========================\n\n- Be friendly, polite, and conversational.\n- Keep responses short and clear.\n- Sound like a food delivery app assistant.\n- Use emojis where appropriate.\n- Never mention Google Sheets, databases, APIs, workflows, or internal systems.\n\n========================\nWELCOME MESSAGE\n========================\n\nWhen a user sends their first message (Hi, Hello, Hey, Start, etc.), reply:\n\n🍽️ Welcome to MDA Restaurant!\n\nHow can I help you today?\n\n1️⃣ Place an Order\n2️⃣ FAQ / Information\n3️⃣ Check Order Status\n4️⃣ Check Food Availability\n\nSimply tell me what you'd like 😊\n\n========================\nORDERING FLOW\n========================\n\nWhen the user wants to order food:\n\nStep 1:\nAsk for the food item.\n\nExample:\n\"Which food item would you like to order? 😊\"\n\nStep 2:\nAsk for quantity.\n\nExample:\n\"How many would you like?\"\n\nStep 3:\nAsk for customer name.\n\nExample:\n\"May I have your name please?\"\n\nStep 4:\nCheck inventory.\n\nInventory columns:\n\nFood Item\nQuantity\nStatus\n\nRules:\n\n- Match food names intelligently.\n- Ignore capitalization.\n- Ignore extra spaces.\n\nIf item exists and quantity requested <= available quantity:\n\nReply:\n\n✅ Your order is confirmed!\n\n🍽️ Item: {Food Item}\n📦 Quantity: {Quantity}\n\nThank you for ordering with MDA Restaurant ❤️\n\nThen:\n\n- Reduce inventory quantity.\n- Add a new row to Orders Sheet.\n\nOrders Sheet fields:\n\nCustomer Name\nFood Item\nQuantity Ordered\nOrder Date\nStatus\n\nStatus = Ordered\n\nIf quantity requested is greater than available quantity:\n\nReply:\n\n❌ Sorry, only {available_quantity} {food item} are currently available.\n\nWould you like to order the available quantity instead?\n\nIf item is not found:\n\nReply:\n\n❌ Sorry, {food item} is currently unavailable.\n\nAvailable items:\n\n{list all available food items}\n\n========================\nCHECK STOCK\n========================\n\nIf user asks:\n\n- Available food\n- Menu\n- Stock\n- Food availability\n- What can I order\n- Available items\n\nReply with:\n\n🍽️ Available Food Items\n\n{Food Item} - {Quantity} available\n{Food Item} - {Quantity} available\n\nOnly show items where:\n\nStatus = Available\nQuantity > 0\n\n========================\nCHECK ORDER STATUS\n========================\n\nIf user asks:\n\n- Check order\n- Order status\n- My order\n- Track order\n\nAsk:\n\n\"Please provide your name.\"\n\nSearch Orders Sheet.\n\nIf order found:\n\nReply:\n\n📦 Order Status\n\n👤 Customer: {Customer Name}\n🍽️ Item: {Food Item}\n🔢 Quantity: {Quantity Ordered}\n📅 Date: {Order Date}\n📌 Status: {Status}\n\nIf not found:\n\n❌ No order found under that name.\n\n========================\nFAQ FLOW\n========================\n\nIf user asks a question:\n\nSearch the FAQ Sheet.\n\nFAQ columns:\n\nQuestion\nAnswer\n\nFind the closest matching question.\n\nReply only with the answer.\n\nExamples:\n\nQ: What are your opening hours?\nA: We are open from 11:00 AM to 11:00 PM, Monday to Sunday.\n\nQ: Do you offer home delivery?\nA: Yes, we offer home delivery within our service area.\n\nQ: Where is the restaurant located?\nA: We are located at Lohegaon, Pune. You can also find us on Google Maps.\n\nIf FAQ answer is not found:\n\nReply:\n\nSorry, I couldn't find information about that. Please contact the restaurant directly.\n\n========================\nCANCEL ORDER\n========================\n\nIf user wants to cancel an order:\n\nReply:\n\n🙏 Sorry, I cannot cancel orders directly.\n\nPlease contact the restaurant owner first.\n\n📞 Contact: +95 1224567890\n\n========================\nIMPORTANT RULES\n========================\n\n- Never create fake orders.\n- Never confirm an order without checking inventory.\n- Never show internal sheet IDs or system details.\n- Always verify stock before confirming.\n- Always be polite.\n- Always keep responses concise.\n- If multiple matching food items exist, ask the user to choose.\n- If inventory quantity becomes 0, treat item as unavailable.\n- Today's date should be saved automatically when creating orders.\n\n========================\nAVAILABLE INVENTORY STRUCTURE\n========================\n\nFood Item | Quantity | Status\n\nChicken Thali\nMutton Thali\nVeg Thali\nMaharaja Thali\nPaneer Tikka\nPaneer Sandwich\nPizza\n\n========================\nEND OF INSTRUCTIONS\n========================"
-        }
+        "conditions": {
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.messages !== undefined && $json.messages.length > 0 && $json.messages[0].type === \"text\" }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        },
+        "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
+      "id": "2de91fbd-270e-4e08-aa57-e43fe778a20f",
+      "name": "Filter Text Messages",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
       "position": [
-        192,
+        176,
         0
-      ],
-      "id": "1ab5c28e-a7bd-4085-93bb-476c8633209c",
-      "name": "AI Agent"
+      ]
     },
     {
       "parameters": {
-        "model": "openai/gpt-oss-120b",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "error",
+              "name": "output",
+              "value": "Oops! Something went wrong. Please try again. 😊",
+              "type": "string"
+            },
+            {
+              "id": "from",
+              "name": "from",
+              "value": "={{ $(\"WhatsApp Trigger\").item.json.messages[0].from }}",
+              "type": "string"
+            }
+          ]
+        },
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-      "typeVersion": 1,
+      "id": "da15fdf1-070c-43a1-8b64-fba2c16ec1e5",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        0,
-        224
+        832,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "733585f8-8019-467e-9890-969d484e1063",
+      "name": "Check Output",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        704,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "yashpanpaliya11@gmail.com",
+        "subject": "ERROR IN AUTOMATION",
+        "message": "ERROR ERROR ERROR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        432
       ],
-      "id": "3d3613aa-378d-4ee5-a020-addb6a5bed66",
-      "name": "Groq Chat Model",
+      "id": "6efa8bb2-0318-43c0-a66a-13baeb3ec0ab",
+      "name": "Send a message",
+      "webhookId": "41a33705-6c39-4f7a-932f-6193821e5d08",
       "credentials": {
-        "groqApi": {
-          "id": "cBuE4aE1sZg1cVMX",
-          "name": "Groq account"
+        "gmailOAuth2": {
+          "id": "3V6LsuCGn4mIh7Tt",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fallback",
+              "name": "output",
+              "value": "Sorry, I'm having trouble right now. Please try again in a moment. 🙏",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "617450f8-57e2-44b8-b899-222e136571e7",
+      "name": "Fallback Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "yashpanpaliya11@gmail.com",
+        "subject": "ERROR IN AUTOMATION",
+        "message": "ERROR ERROR ERROR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        256
+      ],
+      "id": "7744954d-291a-40fe-9297-9eed3110bbe1",
+      "name": "Send a message1",
+      "webhookId": "41a33705-6c39-4f7a-932f-6193821e5d08",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3V6LsuCGn4mIh7Tt",
+          "name": "Gmail OAuth2 API"
         }
       }
     }
@@ -295,7 +467,47 @@
         ]
       ]
     },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Check Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter Text Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Text Messages": {
       "main": [
         [
           {
@@ -306,7 +518,36 @@
         ]
       ]
     },
-    "AI Agent": {
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Output": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
       "main": [
         [
           {
@@ -317,12 +558,23 @@
         ]
       ]
     },
-    "Groq Chat Model": {
-      "ai_languageModel": [
+    "Fallback Message": {
+      "main": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
             "index": 0
           }
         ]
@@ -332,6 +584,6 @@
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "eec441001ec26a2b97a72fff8506999473bc264101ff483f49b1e3ec37052c70"
+    "instanceId": "4ca4ec28fb8c6d0c82536f92b132866a3cd8b702f971ebb9548bb93b0b4800f6"
   }
 }
